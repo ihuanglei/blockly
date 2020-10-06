@@ -1,26 +1,21 @@
 /**
  * @license
  * Copyright 2019 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 suite('Dropdown Fields', function() {
+  setup(function() {
+    sharedTestSetup.call(this);
+  });
+  teardown(function() {
+    sharedTestTeardown.call(this);
+  });
   function assertValue(dropdownField, expectedValue, expectedText) {
     var actualValue = dropdownField.getValue();
     var actualText = dropdownField.getText();
-    assertEquals(actualValue, expectedValue);
-    assertEquals(actualText, expectedText);
+    chai.assert.equal(actualValue, expectedValue);
+    chai.assert.equal(actualText, expectedText);
   }
   suite('Constructor', function() {
     test('Empty', function() {
@@ -38,7 +33,7 @@ suite('Dropdown Fields', function() {
       chai.assert.throws(function() {
         new Blockly.FieldDropdown([1, 2, 3]);
       });
-      chai.assert(stub.calledThrice);
+      sinon.assert.calledThrice(stub);
       stub.restore();
     });
     test('Array Items with Invalid IDs', function() {
@@ -46,7 +41,7 @@ suite('Dropdown Fields', function() {
       chai.assert.throws(function() {
         new Blockly.FieldDropdown([['1', 1], ['2', 2], ['3', 3]]);
       });
-      chai.assert(stub.calledThrice);
+      sinon.assert.calledThrice(stub);
       stub.restore();
     });
     test('Array Items with Invalid Content', function() {
@@ -54,7 +49,7 @@ suite('Dropdown Fields', function() {
       chai.assert.throws(function() {
         new Blockly.FieldDropdown([[1, '1'], [2, '2'], [3, '3']]);
       });
-      chai.assert(stub.calledThrice);
+      sinon.assert.calledThrice(stub);
       stub.restore();
     });
     test('Text Dropdown', function() {
@@ -104,7 +99,7 @@ suite('Dropdown Fields', function() {
       chai.assert.throws(function() {
         Blockly.FieldDropdown.fromJson({ options: [1, 2, 3] });
       });
-      chai.assert(stub.calledThrice);
+      sinon.assert.calledThrice(stub);
       stub.restore();
     });
     test('Array Items with Invalid IDs', function() {
@@ -113,7 +108,7 @@ suite('Dropdown Fields', function() {
         Blockly.FieldDropdown.fromJson(
             { options:[['1', 1], ['2', 2], ['3', 3]] });
       });
-      chai.assert(stub.calledThrice);
+      sinon.assert.calledThrice(stub);
       stub.restore();
     });
     test('Array Items with Invalid Content', function() {
@@ -122,7 +117,7 @@ suite('Dropdown Fields', function() {
         Blockly.FieldDropdown.fromJson(
             { options:[[1, '1'], [2, '2'], [3, '3']] });
       });
-      chai.assert(stub.calledThrice);
+      sinon.assert.calledThrice(stub);
       stub.restore();
     });
     test('Text Dropdown', function() {
@@ -156,6 +151,11 @@ suite('Dropdown Fields', function() {
       assertValue(this.dropdownField, 'A', 'a');
     });
     test('Valid ID', function() {
+      this.dropdownField.setValue('B');
+      assertValue(this.dropdownField, 'B', 'b');
+    });
+    test('With source block', function() {
+      this.dropdownField.setSourceBlock(createTestBlock());
       this.dropdownField.setValue('B');
       assertValue(this.dropdownField, 'B', 'b');
     });

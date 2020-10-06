@@ -1,18 +1,7 @@
 /**
  * @license
  * Copyright 2016 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
@@ -27,6 +16,7 @@
  */
 goog.provide('Blockly.Events');
 
+goog.require('Blockly.registry');
 goog.require('Blockly.utils');
 
 
@@ -349,53 +339,15 @@ Blockly.Events.getDescendantIds = function(block) {
  * @param {!Object} json JSON representation.
  * @param {!Blockly.Workspace} workspace Target workspace for event.
  * @return {!Blockly.Events.Abstract} The event represented by the JSON.
+ * @throws {Error} if an event type is not found in the registry.
  */
 Blockly.Events.fromJson = function(json, workspace) {
-  // TODO: Should I have a way to register a new event into here?
-  var event;
-  switch (json.type) {
-    case Blockly.Events.CREATE:
-      event = new Blockly.Events.Create(null);
-      break;
-    case Blockly.Events.DELETE:
-      event = new Blockly.Events.Delete(null);
-      break;
-    case Blockly.Events.CHANGE:
-      event = new Blockly.Events.Change(null, '', '', '', '');
-      break;
-    case Blockly.Events.MOVE:
-      event = new Blockly.Events.Move(null);
-      break;
-    case Blockly.Events.VAR_CREATE:
-      event = new Blockly.Events.VarCreate(null);
-      break;
-    case Blockly.Events.VAR_DELETE:
-      event = new Blockly.Events.VarDelete(null);
-      break;
-    case Blockly.Events.VAR_RENAME:
-      event = new Blockly.Events.VarRename(null, '');
-      break;
-    case Blockly.Events.UI:
-      event = new Blockly.Events.Ui(null, '', '', '');
-      break;
-    case Blockly.Events.COMMENT_CREATE:
-      event = new Blockly.Events.CommentCreate(null);
-      break;
-    case Blockly.Events.COMMENT_CHANGE:
-      event = new Blockly.Events.CommentChange(null, '', '');
-      break;
-    case Blockly.Events.COMMENT_MOVE:
-      event = new Blockly.Events.CommentMove(null);
-      break;
-    case Blockly.Events.COMMENT_DELETE:
-      event = new Blockly.Events.CommentDelete(null);
-      break;
-    case Blockly.Events.FINISHED_LOADING:
-      event = new Blockly.Events.FinishedLoading(workspace);
-      break;
-    default:
-      throw Error('Unknown event type.');
+  var eventClass = Blockly.registry.getClass(Blockly.registry.Type.EVENT,
+      json.type);
+  if (!eventClass) {
+    throw Error('Unknown event type.');
   }
+  var event = new eventClass();
   event.fromJson(json);
   event.workspaceId = workspace.id;
   return event;

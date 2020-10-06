@@ -1,18 +1,7 @@
 /**
  * @license
  * Copyright 2019 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 /**
@@ -25,6 +14,7 @@ goog.provide('Blockly.Events.FinishedLoading');
 
 goog.require('Blockly.Events');
 goog.require('Blockly.Events.Ui');
+goog.require('Blockly.registry');
 goog.require('Blockly.utils.object');
 
 
@@ -33,17 +23,24 @@ goog.require('Blockly.utils.object');
  * Used to notify the developer when the workspace has finished loading (i.e
  * domToWorkspace).
  * Finished loading events do not record undo or redo.
- * @param {!Blockly.Workspace} workspace The workspace that has finished
- *    loading.
- * @extends {Blockly.Events.Abstract}
+ * @param {!Blockly.Workspace=} opt_workspace The workspace that has finished
+ *    loading.  Undefined for a blank event.
+ * @extends {Blockly.Events.Ui}
  * @constructor
  */
-Blockly.Events.FinishedLoading = function(workspace) {
+Blockly.Events.FinishedLoading = function(opt_workspace) {
+
+  /**
+   * Whether or not the event is blank (to be populated by fromJson).
+   * @type {boolean}
+   */
+  this.isBlank = typeof opt_workspace == 'undefined';
+
   /**
    * The workspace identifier for this event.
    * @type {string}
    */
-  this.workspaceId = workspace.id;
+  this.workspaceId = opt_workspace ? opt_workspace.id : '';
 
   /**
    * The event group ID for the group this event belongs to. Groups define
@@ -87,6 +84,10 @@ Blockly.Events.FinishedLoading.prototype.toJson = function() {
  * @param {!Object} json JSON representation.
  */
 Blockly.Events.FinishedLoading.prototype.fromJson = function(json) {
+  this.isBlank = false;
   this.workspaceId = json['workspaceId'];
   this.group = json['group'];
 };
+
+Blockly.registry.register(Blockly.registry.Type.EVENT,
+    Blockly.Events.FINISHED_LOADING, Blockly.Events.FinishedLoading);
